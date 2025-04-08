@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 function AddShare(){
   if grep -qF "$2" "/etc/fstab"; then return; fi
   mkdir -p "$2"
@@ -15,7 +13,7 @@ EOF
   mount "$1"
   # mount -v -t cifs "$1" "$2" -o credentials="$3"
 }
-  AddShare "//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode" "/home/SetupArch" "/root/smb-credentials-WU1.cifs" okminh 'Samba21751@'
+  AddShare "//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode" "/home/SetupArch" "/root/smb-credentials-WU1.cifs" okminh "$1"
 
 cd "/home/SetupArch/BeProArch"
 bash setup.sh
