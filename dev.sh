@@ -1,19 +1,56 @@
-function AddShare(){
-  if grep -qF "$2" "/etc/fstab"; then return; fi
-  mkdir -p "$2"
-  chown okminh:smbusers "$2"
-  cat <<EOF >>/etc/fstab
-$1 $2 cifs credentials=$3 0 0
-EOF
-  cat <<EOF >"$3"
-user=$4
-password=$5
-EOF
-  systemctl daemon-reload
-  mount "$1"
-  # mount -v -t cifs "$1" "$2" -o credentials="$3"
-}
-  AddShare "//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode" "/home/SetupArch" "/root/smb-credentials-WU1.cifs" okminh "Samba21751@"
+#!/usr/bin/env bash
 
-cd "/home/SetupArch/BeProArch"
-bash setup.sh
+__step=0
+__step(){
+  local step=""; [ -n "${2:-}" ] && { __step=$((__step+1)); step="[$__step]"; }
+  [[ -z $step ]] && step="--$(printf '%.s-' $(seq 1 ${#__step}))"
+  pad='------------------------------------------------------------------------'
+  printf "\e[1;35m%s\e[0m %s${step} %s\n" "➧$1" "${pad:${#1}}" "${BASH_SOURCE[0]}" # • ${FUNCNAME[1]}
+}
+
+function tui::ask(){
+  if [[ ${1:-} == "-p" ]]; then shift; fi
+  local prompt="${1:-}"
+  while true; do
+    read -p "$prompt" -r reply
+    [[ -z $reply ]] && { prompt="Again: " ; continue; }
+    echo "$reply"
+    break
+  done
+}
+
+__step "## Copy files from local network"  -------------------------------------
+
+# Ask for username
+echo 'Account to access local network share:'
+NET_USER="$(tui::ask "Username: ")"
+NET_PASS="$(tui::ask "Password: ")"
+
+add_cifs_credentials(){
+  cat <<EOF >"$1"
+user=$2
+password=$3
+EOF
+}
+
+cred_path="${HOME}/.smbcredentials"
+add_cifs_credentials $cred_path $NET_USER $NET_PASS
+
+net_path="//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode/BeProArch"
+mount_point="/home/SetupArch"
+
+sudo mount -t cifs -o credentials=$cred_path "$net_path" "$mount_point"
+
+
+__step "## Enable root passwordless login over SSH (for Dev)"  -----------------
+ENABLE_ROOT_LOGIN(){
+  local conf="${1:-}/etc/ssh/sshd_config"
+  if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
+    sed -i.bak -E -e 's/^#?\s*(PermitRootLogin).*$/\1 yes/' "${conf}"
+    perl -pe 's/^\s*#?\s*PermitEmptyPasswords(?!\S).*$/PermitEmptyPasswords yes/' -i~ -- "${conf}"
+    systemctl restart sshd
+  fi
+  GREP_COLOR="mt=1;31" grep -n --color -P "^#?\s*PermitRootLogin" "${conf}"
+  GREP_COLOR="mt=1;31" grep -n --color -P '^\s*(?<!#)\s*PermitEmptyPasswords(?!\S)' "${conf}" || true
+}
+ENABLE_ROOT_LOGIN ""
