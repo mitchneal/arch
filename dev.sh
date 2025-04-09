@@ -37,20 +37,13 @@ cred_path="${HOME}/.smbcredentials"
 add_cifs_credentials $cred_path $NET_USER $NET_PASS
 
 net_path="//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode/BeProArch"
-mount_point="/home/SetupArch"
+mount_point="/home/TempMount"
 
-sudo mount -t cifs -o credentials=$cred_path "$net_path" "$mount_point"
+mkdir -p "$mount_point"
+sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
 
+local_dev="$HOME"
 
-__step "## Enable root passwordless login over SSH (for Dev)"  -----------------
-ENABLE_ROOT_LOGIN(){
-  local conf="${1:-}/etc/ssh/sshd_config"
-  if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
-    sed -i.bak -E -e 's/^#?\s*(PermitRootLogin).*$/\1 yes/' "${conf}"
-    perl -pe 's/^\s*#?\s*PermitEmptyPasswords(?!\S).*$/PermitEmptyPasswords yes/' -i~ -- "${conf}"
-    systemctl restart sshd
-  fi
-  GREP_COLOR="mt=1;31" grep -n --color -P "^#?\s*PermitRootLogin" "${conf}"
-  GREP_COLOR="mt=1;31" grep -n --color -P '^\s*(?<!#)\s*PermitEmptyPasswords(?!\S)' "${conf}" || true
-}
-ENABLE_ROOT_LOGIN ""
+cp -R "$$mount_point" "$local_dev"
+cd "$local_dev"
+bash setup.sh
