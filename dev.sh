@@ -30,7 +30,7 @@ EOF
 
 cred_path="${HOME}/.smbcredentials"
 
-if [[ -e "$cred_path" ]]; then
+if [[ ! -e "$cred_path" ]]; then
   echo 'Account to access local network share:'
   NET_USER="$(tui::ask "Username: ")"
   NET_PASS="$(tui::ask "Password: ")"
