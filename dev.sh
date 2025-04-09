@@ -55,11 +55,10 @@ if ! check_mount "$mount_point"; then
   sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
 fi
 
-exit
-local_dev="$HOME"
-
-cp -R --update -f "$mount_point" "$local_dev"
-cd "$local_dev/BeProArch"
+local_dev="$HOME/BeProArch"
+mkdir -p "$local_dev"
+cp -R --update -f "$mount_point"/* "$local_dev"
+cd "$local_dev"
 bash setup.sh
 
 
