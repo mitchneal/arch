@@ -44,6 +44,20 @@ sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
 
 local_dev="$HOME"
 
-cp -R "$$mount_point" "$local_dev"
+cp -R --update -f "$$mount_point" "$local_dev"
 cd "$local_dev"
 bash setup.sh
+
+
+__step "## Enable root passwordless login over SSH (for Dev)"  -----------------
+ENABLE_ROOT_LOGIN(){
+  local conf="${1:-}/etc/ssh/sshd_config"
+  if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
+    sed -i.bak -E -e 's/^#?\s*(PermitRootLogin).*$/\1 yes/' "${conf}"
+    perl -pe 's/^\s*#?\s*PermitEmptyPasswords(?!\S).*$/PermitEmptyPasswords yes/' -i~ -- "${conf}"
+    systemctl restart sshd
+  fi
+  GREP_COLOR="mt=1;31" grep -n --color -P "^#?\s*PermitRootLogin" "${conf}"
+  GREP_COLOR="mt=1;31" grep -n --color -P '^\s*(?<!#)\s*PermitEmptyPasswords(?!\S)' "${conf}" || true
+}
+ENABLE_ROOT_LOGIN ""
