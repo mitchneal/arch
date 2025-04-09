@@ -21,11 +21,6 @@ function tui::ask(){
 
 __step "## Copy files from local network"  -------------------------------------
 
-# Ask for username
-echo 'Account to access local network share:'
-NET_USER="$(tui::ask "Username: ")"
-NET_PASS="$(tui::ask "Password: ")"
-
 add_cifs_credentials(){
   cat <<EOF >"$1"
 user=$2
@@ -34,7 +29,13 @@ EOF
 }
 
 cred_path="${HOME}/.smbcredentials"
-add_cifs_credentials $cred_path $NET_USER $NET_PASS
+
+if [[ -e "$cred_path" ]]; then
+  echo 'Account to access local network share:'
+  NET_USER="$(tui::ask "Username: ")"
+  NET_PASS="$(tui::ask "Password: ")"
+  add_cifs_credentials $cred_path $NET_USER $NET_PASS
+fi
 
 net_path="//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode/BeProArch"
 mount_point="/home/TempMount"
