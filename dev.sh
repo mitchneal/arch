@@ -37,16 +37,29 @@ if [[ ! -e "$cred_path" ]]; then
   add_cifs_credentials $cred_path $NET_USER $NET_PASS
 fi
 
+# Check if a partition is mounted
+check_mount() {
+    if ! mount | grep -q "$1"; then
+        error_msg "No partition mounted at $1. Please mount a partition first."
+        return 1
+    fi
+    return 0
+}
+
 net_path="//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode/BeProArch"
 mount_point="/home/TempMount"
 
-mkdir -p "$mount_point"
-sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
+if ! check_mount "$mount_point"; then
+  echo "Mounting..."
+  mkdir -p "$mount_point"
+  sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
+fi
 
+exit
 local_dev="$HOME"
 
 cp -R --update -f "$mount_point" "$local_dev"
-cd "$local_dev"
+cd "$local_dev/BeProArch"
 bash setup.sh
 
 
