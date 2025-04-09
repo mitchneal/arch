@@ -45,7 +45,7 @@ sudo mount -t cifs -o credentials="$cred_path" "$net_path" "$mount_point"
 
 local_dev="$HOME"
 
-cp -R --update -f "$$mount_point" "$local_dev"
+cp -R --update -f "$mount_point" "$local_dev"
 cd "$local_dev"
 bash setup.sh
 
