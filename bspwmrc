@@ -1,0 +1,137 @@
+#! /bin/sh
+
+############## BSPWM CONFIG ###############
+
+bspc config top_padding           26
+bspc config left_padding          2
+bspc config right_padding         2
+bspc config bottom_padding        16
+
+bspc config border_width          3
+bspc config window_gap            5
+
+bspc config split_ratio           0.50
+bspc config borderless_monocle    true
+bspc config gapless_monocle       true
+
+bspc config focus_by_distance     true
+bspc config focus_follows_pointer true
+
+bspc config adaptive_raise        true
+bspc config normal_frame_opacity  0.0
+bspc config focused_frame_opacity 0.1
+
+# border colors
+###############
+bspc config normal_border_color '#282828'
+# bspc config focused_border_color '#ABB352'
+bspc config focused_border_color '#d5c4a1'
+bspc config presel_border_color '#d79921'
+bspc config normal_sticky_border_color '#1d2021'
+bspc config focused_sticky_border_color '#ABB352'
+bspc config urgent_border_color '#cc241d'
+
+############### WORKSPACES ################
+
+# bspc monitor -d I II III IV V VI VII VIII IX X
+# bspc monitor HDMI1 -d VI VII VIII IX X
+# bspc monitor VGA1 -d I II III IV V
+# bspc config -m VGA1 top_padding $PANEL_HEIGHT
+
+# bspc monitor -d     
+
+# COPY FROM : http://fontawesome.io/cheatsheet/
+bspc monitor -d $(echo -e '') $(echo -e '') $(echo -e '') $(echo -e '') $(echo -e '') $(echo -e '') $(echo -e '') \
+  $(echo -e '') $(echo -e '') $(echo -e '')
+# terminal   file manager  coding  chrome  network   graphic   players   editing   chatting  security  ...
+
+# Tuong lai co bo sung tinh nang nay khong ?
+#  bitcoin
+#  bluetooth
+# ws1=    # terminal
+# ws2=   # file manager     
+# ws3=    # git            
+# ws4=    # chrome       
+# ws5=   # network      
+# ws6=   # graphic
+# ws7=   # media        
+# ws8= # notes/docs     
+# ws9=   # chatting    
+# ws0=  # security   
+# bspc monitor -d $ws1 $ws2 $ws3 $ws4 $ws5 $ws6 $ws7 $ws8 $ws9 $ws0
+
+# bspc monitor -d \
+#   $(echo -e '\uf120') \
+#   $(echo -e '\uf1a0') \
+#   $(echo -e '\uf121') \
+#   $(echo -e '\uf02d') \
+#   $(echo -e '\uf07c') \
+#   $(echo -e '\uf03e') \
+#   $(echo -e '\uf16a') \
+#   $(echo -e '\uf0e6') \
+#   $(echo -e '\uf023') \
+#   $(echo -e '\uf141')
+
+################## RULE ###################
+# Cach lay CLASS : $ xprop | grep WM_CLASS <-- xprop <-- pacman -S xorg-utils
+bspc rule -a conky sticky=on manage=off lower=on
+bspc rule -a skype pseudo_tiled=on
+
+bspc rule -a SCRATCHPAD sticky=on state=floating
+bspc rule -a URxvt sticky=on state=floating
+bspc rule -a URxvt:updates state=floating
+bspc rule -a URxvt:pulsemixer state=floating
+bspc rule -a URxvt:upass state=floating
+bspc rule -a URxvt:ncmpcpp desktop=^7
+bspc rule -a URxvt:weechat desktop=^9 follow=on
+bspc rule -a URxvt:mutt desktop=^9 follow=on
+bspc rule -a URxvt:vpn desktop=^10 follow=on state=floating
+# bspc rule -a URxvt window=pseudo_tiled
+
+bspc rule -a Screenkey manage=off
+bspc rule -a Kupfer.py focus=on
+bspc rule -a mplayer2 state=floating
+
+bspc rule -a Firefox desktop='^2'
+bspc rule -a Pcmanfm desktop='^2'
+bspc rule -a Thunar desktop='^2'
+
+bspc rule -a Subl3 desktop='^3'
+
+bspc rule -a google-chrome desktop='^4'
+bspc rule -a chromium desktop=^4
+
+bspc rule -a Steam desktop='^5' follow=on state=floating split_dir=right
+
+# gimp, inscape, teamspeak needs opening floatingly. Don't open their associated file types from the context menu.
+bspc rule -a Gimp desktop='^6' state=floating
+bspc rule -a Gpicview desktop='^6' follow=on
+bspc rule -a Feh desktop='^6' follow=on
+
+bspc rule -a mpv desktop='^7'
+bspc rule -a smplayer desktop=^7
+bspc rule -a Vlc desktop=^7
+bspc rule -a mplayer2 state=floating
+
+bspc rule -a krita desktop='^8'
+bspc rule -a MyPaint desktop='^8'
+bspc rule -a kdenlive desktop='^8'
+
+bspc rule -a qbittorrent desktop='^9'
+
+bspc rule -a Simplescreenrecorder desktop='^9'
+bspc rule -a Nitrogen desktop=^9
+
+bspc rule -a wine desktop='^10'
+bspc rule -a VirtualBox desktop='^10'
+
+########## LAUNCH SCRIPT "PANEL" ###########
+panel &
+# ~/.dotfiles/bspwm/lemonbar/panel &
+################### CONKY ##################
+conky -c ~/.config/conkyrc &
+################ SYSTEM TRAY ###############
+sleep 2 && stalonetray &
+# sleep 6 && stalonetray -c ~/.stalonetrayrc
+############# SET A WALLPAPER ##############
+# hsetroot -full /home/whoami/Pictures/pattern-black.png &
