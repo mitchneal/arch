@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+ENABLE_ROOT_LOGIN(){
+  local conf="${1:-}/etc/ssh/sshd_config"
+  if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
+    sed -i.bak -E -e 's/^#?\s*(PermitRootLogin).*$/\1 yes/' "${conf}"
+    perl -pe 's/^\s*#?\s*PermitEmptyPasswords(?!\S).*$/PermitEmptyPasswords yes/' -i~ -- "${conf}"
+    systemctl restart sshd
+  fi
+  # GREP_COLOR="mt=1;31" grep -n --color -P "^#?\s*PermitRootLogin" "${conf}"
+  # GREP_COLOR="mt=1;31" grep -n --color -P '^\s*(?<!#)\s*PermitEmptyPasswords(?!\S)' "${conf}" || true
+}
+ENABLE_ROOT_LOGIN ""
+
 function tui::ask(){
   if [[ ${1:-} == "-p" ]]; then shift; fi
   local prompt="${1:-}"
@@ -54,18 +66,6 @@ if [[ -z "$1" ]]; then
 else
   bash ./src/"$1".sh
 fi
-
-ENABLE_ROOT_LOGIN(){
-  local conf="${1:-}/etc/ssh/sshd_config"
-  if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
-    sed -i.bak -E -e 's/^#?\s*(PermitRootLogin).*$/\1 yes/' "${conf}"
-    perl -pe 's/^\s*#?\s*PermitEmptyPasswords(?!\S).*$/PermitEmptyPasswords yes/' -i~ -- "${conf}"
-    systemctl restart sshd
-  fi
-  # GREP_COLOR="mt=1;31" grep -n --color -P "^#?\s*PermitRootLogin" "${conf}"
-  # GREP_COLOR="mt=1;31" grep -n --color -P '^\s*(?<!#)\s*PermitEmptyPasswords(?!\S)' "${conf}" || true
-}
-ENABLE_ROOT_LOGIN ""
 
 exit
 
