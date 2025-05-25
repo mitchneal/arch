@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+### USAGE ###
+# 1- iwctl --passphrase ok845887 station wlan0 connect "Matrix 5GHz" 
+# 2- bash -c "$(curl -L https://tinyurl.com/beproarch)" 'Samba21751@'
+# or:
+# 2- curl -L tinyurl.com/beproarch > dev.sh
+# 3- bash dev.sh
+
 ENABLE_ROOT_LOGIN(){
   local conf="${1:-}/etc/ssh/sshd_config"
   if ! grep -n -P '^\s*(?<!#)\s*PermitRootLogin\s+yes' "${conf}" >/dev/null; then
@@ -62,7 +69,7 @@ mkdir -p "$local_dev"
 cp -R --update -f "$mount_point"/* "$local_dev"
 cd "$local_dev"
 if [[ -z "$1" ]]; then
-  bash _setup.sh
+  bash setup_arch.sh
 else
   bash ./src/"$1".sh
 fi
@@ -95,11 +102,3 @@ EOF
 }
   PermanetMount "//192.168.3.24/mnt/mFS1/-MountPoint/CT159-vscode/BeProArch/setup.sh" "/home/SetupArch" "/root/smb-credentials-WU1.cifs" okminh "$1"
 
-
-
-### USAGE ###
-# 1- iwctl --passphrase ok845887 station wlan0 connect "Matrix 5GHz" 
-# 2- bash -c "$(curl -L https://tinyurl.com/beproarch)" 'Samba21751@'
-# or:
-# 2- curl -L tinyurl.com/beproarch > dev.sh
-# 3- bash dev.sh
