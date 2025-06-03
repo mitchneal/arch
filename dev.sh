@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-### USAGE ###
-# 1- iwctl --passphrase ok845887 station wlan0 connect "Matrix 5GHz" 
-# 2- bash -c "$(curl -L https://tinyurl.com/beproarch)" 'Samba21751@'
-# or:
-# 2- curl -L tinyurl.com/beproarch > dev.sh
-# 3- bash dev.sh
 
 ENABLE_ROOT_LOGIN(){
   local conf="${1:-}/etc/ssh/sshd_config"
